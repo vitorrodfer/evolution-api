@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# --- REMOÇÃO DO .env PARA FORÇAR USO APENAS DAS VARIÁVEIS DO RAILWAY ---
+rm -f .env
+
 source ./Docker/scripts/env_functions.sh
 
 if [ "$DOCKER_ENV" != "true" ]; then
