@@ -1,32 +1,22 @@
 #!/bin/bash
 
-source ./Docker/scripts/env_functions.sh
+# Garante que não haja nenhum .env local para o Prisma carregar
+rm -f .env
 
-if [ "$DOCKER_ENV" != "true" ]; then
-    export_env_vars
-fi
-
-if [[ "$DATABASE_PROVIDER" == "postgresql" || "$DATABASE_PROVIDER" == "mysql" ]]; then
-    export DATABASE_URL
-    echo "Deploying migrations for $DATABASE_PROVIDER"
-    echo "Database URL: $DATABASE_URL"
-    # rm -rf ./prisma/migrations
-    # cp -r ./prisma/$DATABASE_PROVIDER-migrations ./prisma/migrations
-    npm run db:deploy
-    if [ $? -ne 0 ]; then
-        echo "Migration failed"
-        exit 1
-    else
-        echo "Migration succeeded"
-    fi
-    npm run db:generate
-    if [ $? -ne 0 ]; then
-        echo "Prisma generate failed"
-        exit 1
-    else
-        echo "Prisma generate succeeded"
-    fi
+# Deploy das migrations PostgreSQL
+if [[ "$DATABASE_PROVIDER" == "postgresql" ]]; then
+  echo "Deploying migrations for postgresql"
+  echo "Database URL: $DATABASE_URL"
+  # Usa o Prisma CLI diretamente, sem carregar .env.local
+  npx prisma migrate deploy --schema prisma/postgresql-schema.prisma
+  STATUS=$?
+  if [ $STATUS -ne 0 ]; then
+    echo "Error: prisma migrate deploy falhou com status $STATUS"
+    exit $STATUS
+  fi
+  echo "Migrations applied successfully"
+  exit 0
 else
-    echo "Error: Database provider $DATABASE_PROVIDER invalid."
-    exit 1
+  echo "Error: Database provider \$DATABASE_PROVIDER invalid."
+  exit 1
 fi
