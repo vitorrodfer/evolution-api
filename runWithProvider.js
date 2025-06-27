@@ -1,14 +1,17 @@
-const dotenv = require('dotenv');
+// runWithProvider.js
+
+// Comentado para não carregar .env local
+// const dotenv = require('dotenv');
+// dotenv.config();
+
 const { execSync } = require('child_process');
 const { existsSync } = require('fs');
-
-dotenv.config();
 
 const { DATABASE_PROVIDER } = process.env;
 const databaseProviderDefault = DATABASE_PROVIDER ?? 'postgresql';
 
 if (!DATABASE_PROVIDER) {
-  console.warn(`DATABASE_PROVIDER is not set in the .env file, using default: ${databaseProviderDefault}`);
+  console.warn(`DATABASE_PROVIDER is not set in the environment, using default: ${databaseProviderDefault}`);
 }
 
 let command = process.argv
